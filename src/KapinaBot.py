@@ -6,7 +6,7 @@ from KapinaCam import KapinaCam
 
 try:
     with open("token", "r") as file:
-        TOKEN = file.read().replace('\n', '')
+        TOKEN = file.read().replace("\n", "")
 except OSError:
     print("Token file not found")
     sys.exit(1)
