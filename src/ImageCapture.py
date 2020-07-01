@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 
 
-class KapinaCam:
+class ImageCapture:
     """
     Abstraction for attached camera equipment.
     Due to silly buffering of webcam hardware and openCV the camera is constantly running in the background.
