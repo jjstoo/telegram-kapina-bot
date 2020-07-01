@@ -10,7 +10,7 @@ class KapinaCam:
     Due to silly buffering of webcam hardware and openCV the camera is constantly running in the background.
     Snapshots are only saved when instructed to do so.
 
-    A minimum intercal can be set to avoid saving snapshots too rapidly.
+    A minimum interval can be set to avoid saving snapshots too rapidly.
     """
     def __init__(self,
                  write_sem,
