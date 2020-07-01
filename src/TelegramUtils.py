@@ -16,7 +16,7 @@ class Message:
                  photo=None,
                  text=None):
         """
-        Initialize attributes to None
+        Initialization
         """
         self.message_id = None
         self.from_user_id = None
