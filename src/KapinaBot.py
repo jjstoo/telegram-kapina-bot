@@ -19,6 +19,9 @@ snapshot_output_file = "snapshot.jpg"
 triggers = {"image": "/kapina",
             "help": "/help"}
 
+# Thread pool size for smooth handling of multiple requests
+pool_size = 10
+
 """
 Initialization
 """
@@ -32,7 +35,7 @@ except OSError:
 snapshot_sem = threading.Semaphore(1)
 api = TelegramHttpsAPI(TOKEN)
 cam = KapinaCam(snapshot_sem, snapshot_output_file)
-tpe = ThreadPoolExecutor(max_workers=10)
+tpe = ThreadPoolExecutor(max_workers=pool_size)
 
 
 def handle_image_request(message: Message):
@@ -49,6 +52,11 @@ def handle_image_request(message: Message):
 
 
 def handle_help(message: Message):
+    """
+    Replies to the given message with a help text
+    :param message: Message to reply to
+    :return: None
+    """
     help_text = "Get a snapshot by sending %s" % triggers["image"]
 
     api.send_message(Message(chat_id=message.chat_id,
@@ -65,7 +73,7 @@ def main():
             if triggers["image"] in cmd_arr:
                 tpe.submit(handle_image_request, message)
             elif triggers["help"] in cmd_arr:
-                tpe.submit(handle_help)
+                tpe.submit(handle_help, message)
 
 
 main()
