@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import threading
+from concurrent.futures import ThreadPoolExecutor
 import sys
 import re
 
@@ -14,7 +15,7 @@ User configuration happens here
 # Snapshot filename
 snapshot_output_file = "snapshot.jpg"
 
-# Replace with your own command trigger for sending an image
+# Command triggers
 triggers = {"image": "/kapina",
             "help": "/help"}
 
@@ -31,6 +32,7 @@ except OSError:
 snapshot_sem = threading.Semaphore(1)
 api = TelegramHttpsAPI(TOKEN)
 cam = KapinaCam(snapshot_sem, snapshot_output_file)
+tpe = ThreadPoolExecutor(max_workers=10)
 
 
 def handle_image_request(message: Message):
@@ -61,9 +63,9 @@ def main():
             text = message.text.lower()
             cmd_arr = re.split(r"[@ ]", text)
             if triggers["image"] in cmd_arr:
-                threading.Thread(target=handle_image_request, args=(message,)).start()
+                tpe.submit(handle_image_request, message)
             elif triggers["help"] in cmd_arr:
-                threading.Thread(target=handle_help, args=(message,)).start()
+                tpe.submit(handle_help)
 
 
 main()
