@@ -1,5 +1,6 @@
 import requests
 import random
+import time
 from typing import Dict
 
 
@@ -8,6 +9,7 @@ class NetworkHandler:
     def __init__(self):
 
         self.proxies = None
+        self.proxy_update = False
 
     def https_post(self, url: str, parameters: Dict = None, files: Dict = None) -> requests.Response:
         """
@@ -30,6 +32,14 @@ class NetworkHandler:
         return requests.get(url, params=parameters, headers=headers, proxies=self.proxies)
 
     def set_random_proxy(self):
+
+        # Behold the worlds dumbest spinlock
+        if self.proxy_update:
+            while self.proxy_update:
+                time.sleep(1)
+            return
+
+        self.proxy_update = True
         proxy_list_url = "https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt"
         test_url = 'https://httpbin.org/ip'
         data = requests.get(proxy_list_url).text.split("\n")
@@ -47,11 +57,14 @@ class NetworkHandler:
                 if response == 200:
                     print("SUCCESS")
                     self.proxies = proxies
+                    self.proxy_update = False
                     return
             except Exception as e:
                 print("FAILED")
 
+
         print("No working proxy found")
+        self.proxy_update = False
 
 
 if __name__ == "__main__":

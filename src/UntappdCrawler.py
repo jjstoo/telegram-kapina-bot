@@ -1,6 +1,9 @@
 from concurrent.futures import ThreadPoolExecutor
-from typing import Dict
+from threading import Semaphore, Thread
+from time import sleep
+from typing import Dict, List
 from bs4 import BeautifulSoup
+import requests
 
 from Networking import NetworkHandler
 
@@ -38,6 +41,10 @@ class Beer:
                     self.style,
                     self.img])
 
+    def __str__(self):
+        repr = "*{}* ({}) - {}, {}\n*{:.2f}/5*".format(self.name, self.style, self.brewery, self.abv, self.rating)
+        return repr
+
 
 class UntappdCrawler:
     BASE_URL = "https://untappd.com"
@@ -68,7 +75,10 @@ class UntappdCrawler:
         else:
             return False
 
-    def get_beers_on_list(self, list: str = None):
+    def get_beers_on_list(self, list: str = None, tries = 3):
+
+        if tries == 0:
+            return None
 
         beers = []
         beer_futures = []
@@ -80,19 +90,27 @@ class UntappdCrawler:
                 beer_futures.append(
                     tpe.submit(self.get_beer, UntappdCrawler.BASE_URL + beer.find("a", href=True)["href"]))
 
-            for future in beer_futures:
+            for i, future in enumerate(beer_futures):
                 result = future.result()
                 if result is not None:
                     beers.append(result)
 
             return beers
 
-        except Exception as e:
-            print("Connection to untappd failed, resetting proxy")
+        except requests.exceptions.ProxyError:
+            print("Proxy connection error when getting menu! Retrying")
             self.net.set_random_proxy()
+            return self.get_beers_on_list(list, tries-1)
+
+        except Exception as e:
+            print(str(e) + "while getting venue data! Retrying")
+            return self.get_beers_on_list(list, tries-1)
+
+    def get_beer(self, url: str, tries=3):
+
+        if tries == 0:
             return None
 
-    def get_beer(self, url: str):
         try:
             data = self.net.https_get(url, headers=common_header).text
             soup = BeautifulSoup(data, features="html5lib")
@@ -104,7 +122,7 @@ class UntappdCrawler:
             img = soup.find("a", {"class": "label"}).find("img")["src"]
 
             details = soup.find("div", {"class": "details"})
-            abv = details.find("p", {"class": "abv"}).text
+            abv = details.find("p", {"class": "abv"}).text.strip()
             rating = details.find("div", {"class": "caps"})["data-rating"]
             ratings = details.find("p", {"class": "raters"}).text
 
@@ -115,15 +133,71 @@ class UntappdCrawler:
                         abv=abv,
                         style=style,
                         img=img)
-        except Exception:
-            raise ConnectionError
+
+        except requests.exceptions.ConnectTimeout:
+            print("Connection timed out! Trying again")
+            return self.get_beer(url, tries-1)
+
+        except requests.exceptions.ProxyError:
+            print("Proxy connection error when getting beer data! Finding another one")
+            self.net.set_random_proxy()
+            return self.get_beer(url, tries-1)
+
+        except Exception as e:
+            print("Error getting beer data" + e)
+            return None
+
+
+class Untappd:
+    def __init__(self,
+                 poll_interval):
+        self.poll_interval = poll_interval
+        self.stopped = False
+
+        self.crawler = UntappdCrawler()
+        self.lists = []
+        self.beer_model = {}
+        self.beer_model_sem = Semaphore(1)
+
+    def set_beer_lists(self, lists: Dict):
+        self.crawler.set_beer_lists(lists)
+        for key in lists:
+            self.lists.append(key)
+
+    def update(self):
+        print("Updating beer model")
+        for list in self.lists:
+            new_model = self.crawler.get_beers_on_list(list)
+            if new_model is not None:
+                with self.beer_model_sem:
+                    self.beer_model[list] = new_model
+        print("Beer model update complete!")
+
+    def get_beers_on_list(self, list) -> List[Beer]:
+        with self.beer_model_sem:
+            if list in self.beer_model:
+                return self.beer_model[list]
+            else:
+                return []
+
+    def poll(self):
+        self.stopped = False
+        while not self.stopped:
+            self.update()
+            sleep(60 * self.poll_interval)
+
+    def start(self):
+        Thread(target=self.poll).start()
+
+    def stop(self):
+        self.stopped = True
 
 
 if __name__ == "__main__":
-    untappd = UntappdCrawler()
-    untappd.set_beer_lists({"hana": "https://untappd.com/v/pub-kultainen-apina/17995?ng_menu_id=5035026b-1470-48c7-b82a-bf1df18f5889"})
-
-    untappd.set_default_beer_list("hana")
+    untappd = Untappd(5)
+    untappd.set_beer_lists(
+        {"hana": "https://untappd.com/v/pub-kultainen-apina/17995?ng_menu_id=5035026b-1470-48c7-b82a-bf1df18f5889"})
+    untappd.start()
     beers = untappd.get_beers_on_list("hana")
 
     for beer in beers:
