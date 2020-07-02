@@ -29,6 +29,15 @@ class Beer:
         self.style = style
         self.img = img
 
+    def __bool__(self):
+        return all([self.name,
+                    self.brewery,
+                    self.abv,
+                    self.rating,
+                    self.ratings,
+                    self.style,
+                    self.img])
+
 
 class UntappdCrawler:
     BASE_URL = "https://untappd.com"
@@ -112,13 +121,11 @@ class UntappdCrawler:
 
 if __name__ == "__main__":
     untappd = UntappdCrawler()
-    untappd.set_beer_lists({"hana":
-        [
-            "https://untappd.com/v/pub-kultainen-apina/17995?ng_menu_id=5035026b-1470-48c7-b82a-bf1df18f5889",
-            "section-menu-list-146318694"]})
+    untappd.set_beer_lists({"hana": "https://untappd.com/v/pub-kultainen-apina/17995?ng_menu_id=5035026b-1470-48c7-b82a-bf1df18f5889"})
 
     untappd.set_default_beer_list("hana")
     beers = untappd.get_beers_on_list("hana")
 
     for beer in beers:
-        print(beer.name)
+        if beer:
+            print(beer.name)
