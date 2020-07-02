@@ -6,7 +6,7 @@ import sys
 import re
 
 from TelegramUtils import TelegramHttpsAPI, Message
-from ImageCapture import ImageCapture
+from KapinaCam import KapinaCam
 
 """
 User configuration happens here
@@ -30,7 +30,7 @@ except OSError:
 
 snapshot_sem = threading.Semaphore(1)
 api = TelegramHttpsAPI(TOKEN)
-cam = ImageCapture(snapshot_sem, snapshot_output_file)
+cam = KapinaCam(snapshot_sem, snapshot_output_file)
 
 
 def handle_image_request(message: Message):
