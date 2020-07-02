@@ -4,6 +4,8 @@
 from typing import List, Dict
 import requests
 
+from Networking import https_get, https_post
+
 
 class Message:
     """
@@ -74,33 +76,13 @@ class TelegramHttpsAPI:
         self.url = TelegramHttpsAPI.BASE_URL + self.token
         self.update_id = None
 
-    @staticmethod
-    def __https_post(url: str, parameters: Dict = None, files: Dict = None) -> requests.Response:
-        """
-        Raw https post with optional parameters
-        :param url: POST URL
-        :param parameters: Parameters
-        :return: None
-        """
-        return requests.post(url, parameters, files=files)
-
-    @staticmethod
-    def __https_get(url: str, parameters: Dict = None) -> requests.Response:
-        """
-        Raw https get with optional parameters
-        :param url: GET URL
-        :param parameters: Parameters
-        :return: Requests GET object with return code and payload
-        """
-        return requests.get(url, parameters)
-
     def get_updates(self):
         """
         Get unhandled updates
         :return: JSON update data as a dict
         """
         request_url = self.url + TelegramHttpsAPI.GETUPDATES
-        data = self.__https_get(request_url, {"offset": self.update_id})
+        data = https_get(request_url, {"offset": self.update_id})
         try:
             return data.json()["result"]
         except ValueError:
@@ -141,7 +123,7 @@ class TelegramHttpsAPI:
                           "reply_to_message_id": message.reply_to}
             files = {"photo": open(message.photo, "rb")}
 
-            self.__https_post(post_url, parameters, files)
+            https_post(post_url, parameters, files)
 
         elif message.text:
             post_url = self.url + TelegramHttpsAPI.SENDMESSAGE
@@ -149,7 +131,7 @@ class TelegramHttpsAPI:
                           "text": message.text,
                           "reply_to_message_id": message.reply_to}
 
-            self.__https_post(post_url, parameters)
+            https_post(post_url, parameters)
 
         else:
             print("No message content available")
