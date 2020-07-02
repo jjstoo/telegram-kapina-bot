@@ -42,7 +42,7 @@ class UntappdCrawler:
     def set_beer_lists(self, lists: Dict):
         """
         Sets the available beers lists
-        :param lists: Dict["List name": ["List URL", "List HTML element ID"]]
+        :param lists: Dict["List name": "List URL"]
         :return: None
         """
         self.beer_lists = lists
@@ -64,7 +64,7 @@ class UntappdCrawler:
         beers = []
         beer_futures = []
         try:
-            data = self.net.https_get(self.beer_lists[list][0], headers=common_header).text
+            data = self.net.https_get(self.beer_lists[list], headers=common_header).text
             soup = BeautifulSoup(data, features="html5lib")
             raw_beer_list = soup.find("ul", {"class": "menu-section-list"})
             for beer in raw_beer_list.find_all("li"):
