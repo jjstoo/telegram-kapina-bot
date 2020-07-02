@@ -42,8 +42,7 @@ class Beer:
                     self.img])
 
     def __str__(self):
-        repr = "*{}* ({}) - {}, {}\n*{:.2f}/5*".format(self.name, self.style, self.brewery, self.abv, self.rating)
-        return repr
+        return "*{}* ({}) - {}, {}\n*{:.2f}/5*".format(self.name, self.style, self.brewery, self.abv, self.rating)
 
 
 class UntappdCrawler:
@@ -75,7 +74,13 @@ class UntappdCrawler:
         else:
             return False
 
-    def get_beers_on_list(self, list: str = None, tries = 3):
+    def get_beers_on_list(self, list: str = None, tries=3):
+        """
+        Returns the updated beers on a given list
+        :param list: List name
+        :param tries: Download attempts
+        :return: None if failed
+        """
 
         if tries == 0:
             return None
@@ -100,13 +105,19 @@ class UntappdCrawler:
         except requests.exceptions.ProxyError:
             print("Proxy connection error when getting menu! Retrying")
             self.net.set_random_proxy()
-            return self.get_beers_on_list(list, tries-1)
+            return self.get_beers_on_list(list, tries - 1)
 
         except Exception as e:
             print(str(e) + "while getting venue data! Retrying")
-            return self.get_beers_on_list(list, tries-1)
+            return self.get_beers_on_list(list, tries - 1)
 
     def get_beer(self, url: str, tries=3):
+        """
+        Constructs a beer object from given Untappd beer URL
+        :param url: Ber URL
+        :param tries: Max attempts
+        :return: None if failed
+        """
 
         if tries == 0:
             return None
@@ -136,12 +147,12 @@ class UntappdCrawler:
 
         except requests.exceptions.ConnectTimeout:
             print("Connection timed out! Trying again")
-            return self.get_beer(url, tries-1)
+            return self.get_beer(url, tries - 1)
 
         except requests.exceptions.ProxyError:
             print("Proxy connection error when getting beer data! Finding another one")
             self.net.set_random_proxy()
-            return self.get_beer(url, tries-1)
+            return self.get_beer(url, tries - 1)
 
         except Exception as e:
             print("Error getting beer data" + e)
@@ -151,6 +162,10 @@ class UntappdCrawler:
 class Untappd:
     def __init__(self,
                  poll_interval):
+        """
+        Initializes the class for specific poll interval
+        :param poll_interval: Poll interval
+        """
         self.poll_interval = poll_interval
         self.stopped = False
 
@@ -160,11 +175,20 @@ class Untappd:
         self.beer_model_sem = Semaphore(1)
 
     def set_beer_lists(self, lists: Dict):
+        """
+        Setup beer lists
+        :param lists: Dictionary containing the list names and URL's
+        :return: None
+        """
         self.crawler.set_beer_lists(lists)
         for key in lists:
             self.lists.append(key)
 
     def update(self):
+        """
+        Updates all beer lists
+        :return: None
+        """
         print("Updating beer model")
         for list in self.lists:
             new_model = self.crawler.get_beers_on_list(list)
@@ -174,6 +198,11 @@ class Untappd:
         print("Beer model update complete!")
 
     def get_beers_on_list(self, list) -> List[Beer]:
+        """
+        Returns beers on given list
+        :param list: Beer list
+        :return: List of beers, empty list if not found
+        """
         with self.beer_model_sem:
             if list in self.beer_model:
                 return self.beer_model[list]
@@ -181,15 +210,27 @@ class Untappd:
                 return []
 
     def poll(self):
+        """
+        Updates the lists periodically
+        :return: None
+        """
         self.stopped = False
         while not self.stopped:
             self.update()
             sleep(60 * self.poll_interval)
 
     def start(self):
+        """
+        Starts polling
+        :return: None
+        """
         Thread(target=self.poll).start()
 
     def stop(self):
+        """
+        Stops polling
+        :return: None
+        """
         self.stopped = True
 
 

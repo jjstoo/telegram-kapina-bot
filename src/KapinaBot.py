@@ -68,6 +68,11 @@ def handle_help(message: Message):
 
 
 def handle_beers(message: Message):
+    """
+    Replies to the given message with beer tap listing
+    :param message: Mssage to reply to
+    :return: None
+    """
     beers = untappd.get_beers_on_list("hana")
     msg = ""
 
@@ -85,7 +90,12 @@ def handle_beers(message: Message):
 
 
 def build_beer_lists():
-    untappd.set_beer_lists({"hana": "https://untappd.com/v/pub-kultainen-apina/17995?ng_menu_id=5035026b-1470-48c7-b82a-bf1df18f5889"})
+    """
+    Initializes beer lists
+    :return: None
+    """
+    untappd.set_beer_lists({"hana": "https://untappd.com/v/pub-kultainen-apina/17995?ng_menu_id=5035026b-1470-48c7"
+                                    "-b82a-bf1df18f5889"})
 
 
 def main():

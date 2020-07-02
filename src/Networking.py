@@ -32,6 +32,10 @@ class NetworkHandler:
         return requests.get(url, params=parameters, headers=headers, proxies=self.proxies)
 
     def set_random_proxy(self):
+        """
+        Sets or updates the instance to use a random proxy
+        :return: None
+        """
 
         # Behold the worlds dumbest spinlock
         if self.proxy_update:
@@ -61,7 +65,6 @@ class NetworkHandler:
                     return
             except Exception as e:
                 print("FAILED")
-
 
         print("No working proxy found")
         self.proxy_update = False
