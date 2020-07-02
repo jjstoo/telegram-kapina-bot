@@ -60,7 +60,8 @@ def handle_help(message: Message):
     :param message: Message to reply to
     :return: None
     """
-    help_text = "Get a snapshot by sending %s" % triggers["image"]
+    help_text = "Get a snapshot by sending {}\n" \
+                "Get current beer tap with {}".format(triggers["image"], triggers["beers"])
 
     api.send_message(Message(chat_id=message.chat_id,
                              reply_to=message.message_id,
