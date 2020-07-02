@@ -201,12 +201,16 @@ class Untappd:
         :return: None
         """
         print("Updating beer model")
+        failure = False
         for list in self.lists:
             new_model = self.crawler.get_beers_on_list(list)
             if new_model is not None:
                 with self.beer_model_sem:
                     self.beer_model[list] = new_model
-        print("Beer model update complete!")
+            else:
+                failure = True
+
+        print("Beer model update complete with errors!" if failure else "Beer model update complete!")
 
     def get_beers_on_list(self, list) -> List[Beer]:
         """
