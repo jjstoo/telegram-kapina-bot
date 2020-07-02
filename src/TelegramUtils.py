@@ -4,7 +4,7 @@
 from typing import List, Dict
 import requests
 
-from Networking import https_get, https_post
+from Networking import NetworkHandler
 
 
 class Message:
@@ -75,6 +75,7 @@ class TelegramHttpsAPI:
         self.token = token
         self.url = TelegramHttpsAPI.BASE_URL + self.token
         self.update_id = None
+        self.net = NetworkHandler()
 
     def get_updates(self):
         """
@@ -82,7 +83,7 @@ class TelegramHttpsAPI:
         :return: JSON update data as a dict
         """
         request_url = self.url + TelegramHttpsAPI.GETUPDATES
-        data = https_get(request_url, {"offset": self.update_id})
+        data = self.net.https_get(request_url, {"offset": self.update_id})
         try:
             return data.json()["result"]
         except ValueError:
@@ -123,7 +124,7 @@ class TelegramHttpsAPI:
                           "reply_to_message_id": message.reply_to}
             files = {"photo": open(message.photo, "rb")}
 
-            https_post(post_url, parameters, files)
+            self.net.https_post(post_url, parameters, files)
 
         elif message.text:
             post_url = self.url + TelegramHttpsAPI.SENDMESSAGE
@@ -131,8 +132,7 @@ class TelegramHttpsAPI:
                           "text": message.text,
                           "reply_to_message_id": message.reply_to}
 
-            https_post(post_url, parameters)
+            self.net.https_post(post_url, parameters)
 
         else:
             print("No message content available")
-

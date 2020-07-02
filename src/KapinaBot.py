@@ -73,9 +73,9 @@ def handle_beers(message: Message):
 
 def build_beer_lists():
     untappd.set_beer_lists({"hana":
-                                [
-                                    "https://untappd.com/v/pub-kultainen-apina/17995?ng_menu_id=5035026b-1470-48c7-b82a-bf1df18f5889",
-                                    "section-menu-list-146318694"]})
+        [
+            "https://untappd.com/v/pub-kultainen-apina/17995?ng_menu_id=5035026b-1470-48c7-b82a-bf1df18f5889",
+            "section-menu-list-146318694"]})
 
     untappd.set_default_beer_list("hana")
 
@@ -92,7 +92,7 @@ def main():
             elif triggers["help"] in cmd_arr:
                 tpe.submit(handle_help, message)
             elif triggers["beers"] in cmd_arr:
-                handle_beers(message)
+                pass
 
 
 main()

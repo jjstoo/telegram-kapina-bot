@@ -30,8 +30,6 @@ class Beer:
         self.img = img
 
 
-
-
 class UntappdCrawler:
     BASE_URL = "https://untappd.com"
 
@@ -70,7 +68,8 @@ class UntappdCrawler:
             soup = BeautifulSoup(data, features="html5lib")
             raw_beer_list = soup.find("ul", {"class": "menu-section-list"})
             for beer in raw_beer_list.find_all("li"):
-                beer_futures.append(tpe.submit(self.get_beer, UntappdCrawler.BASE_URL + beer.find("a", href=True)["href"]))
+                beer_futures.append(
+                    tpe.submit(self.get_beer, UntappdCrawler.BASE_URL + beer.find("a", href=True)["href"]))
 
             for future in beer_futures:
                 result = future.result()
@@ -123,4 +122,3 @@ if __name__ == "__main__":
 
     for beer in beers:
         print(beer.name)
-
