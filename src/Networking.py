@@ -13,11 +13,11 @@ def https_post(url: str, parameters: Dict = None, files: Dict = None) -> request
     return requests.post(url, parameters, files=files)
 
 
-def https_get(url: str, parameters: Dict = None) -> requests.Response:
+def https_get(url: str, parameters: Dict = None, headers: Dict = None) -> requests.Response:
     """
     Raw https get with optional parameters
     :param url: GET URL
     :param parameters: Parameters
     :return: Requests GET object with return code and payload
     """
-    return requests.get(url, parameters)
+    return requests.get(url, params=parameters, headers=headers)
