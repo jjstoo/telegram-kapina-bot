@@ -1,3 +1,14 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+README
+
+Untappd uses many methods to block web scraping. Due to these measures, this class program utilizes a pool of
+random proxies to avoid being IP blocked from the site. This considerably slows down the update process, so updates are run
+periodically in the background.
+"""
+
 from concurrent.futures import ThreadPoolExecutor
 from threading import Semaphore, Thread
 from time import sleep

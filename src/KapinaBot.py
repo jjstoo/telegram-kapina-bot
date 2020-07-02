@@ -8,7 +8,7 @@ import re
 
 from TelegramUtils import TelegramHttpsAPI, Message
 from KapinaCam import KapinaCam
-from UntappdCrawler import Untappd
+from UntappdUtils import Untappd
 
 """
 User configuration happens here
