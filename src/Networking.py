@@ -33,7 +33,9 @@ class NetworkHandler:
 
     def set_random_proxy(self):
         """
-        Sets or updates the instance to use a random proxy
+        Sets or updates the instance to use a random proxy.
+        Includes a simple spinlock for avoiding multiple access ->
+        Multi-accessors will wait for the first requester to complete proxy update.
         :return: None
         """
 
@@ -50,7 +52,7 @@ class NetworkHandler:
         random.shuffle(data)
 
         for ip in data:
-            print("Connecting to proxy at " + ip, end=" ... ")
+            print("Connecting to proxy at " + ip)
             proxies = {
                 "http": "http://" + ip,
                 "https": "https://" + ip
@@ -59,12 +61,12 @@ class NetworkHandler:
             try:
                 response = requests.get(test_url, proxies=proxies, timeout=5).status_code
                 if response == 200:
-                    print("SUCCESS")
+                    print("Proxy connection succeeded")
                     self.proxies = proxies
                     self.proxy_update = False
                     return
-            except Exception as e:
-                print("FAILED")
+            except Exception:
+                print("Proxy connection failed")
 
         print("No working proxy found")
         self.proxy_update = False
