@@ -1,0 +1,14 @@
+[Unit]
+Description=KapinaBot
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=pi
+WorkingDirectory=/home/pi/kapina
+ExecStart=/usr/bin/env python3 /home/pi/kapina/KapinaBot.py
+
+[Install]
+WantedBy=multi-user.target
