@@ -17,7 +17,8 @@ class Message:
                  reply_to=None,
                  photo=None,
                  text=None,
-                 parse_mode=None):
+                 parse_mode=None,
+                 disable_web_page_preview=False):
         """
         Initialization
         """
@@ -28,6 +29,7 @@ class Message:
         self.photo = photo
         self.text: str = text
         self.parse_mode = parse_mode
+        self.disable_web_page_preview = disable_web_page_preview
 
     def load_from_json(self, json):
         """
@@ -133,7 +135,8 @@ class TelegramHttpsAPI:
             parameters = {"chat_id": message.chat_id,
                           "text": message.text,
                           "reply_to_message_id": message.reply_to,
-                          "parse_mode": message.parse_mode}
+                          "parse_mode": message.parse_mode,
+                          "disable_web_page_preview": message.disable_web_page_preview}
 
             self.net.https_post(post_url, parameters)
 

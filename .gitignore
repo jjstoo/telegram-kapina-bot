@@ -3,3 +3,4 @@
 *.png
 src/token
 .idea/*
+__pycache__/*

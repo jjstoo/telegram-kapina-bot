@@ -3,6 +3,7 @@
 
 import threading
 from concurrent.futures import ThreadPoolExecutor
+from typing import Dict
 import sys
 import re
 
@@ -18,8 +19,9 @@ snapshot_output_file = "snapshot.jpg"
 
 # Command triggers
 triggers = {"image": "/kapina",
-            "help": "/help",
-            "beers": "/hana"}
+            "help": "/help"}
+
+beer_tap_triggers = []
 
 # Thread pool size for smooth handling of multiple requests
 pool_size = 10
@@ -61,20 +63,22 @@ def handle_help(message: Message):
     :return: None
     """
     help_text = "Get a snapshot by sending {}\n" \
-                "Get current beer tap with {}".format(triggers["image"], triggers["beers"])
+                "Currently available beer listings:\n" \
+                "{}".format(triggers["image"], beer_tap_triggers)
 
     api.send_message(Message(chat_id=message.chat_id,
                              reply_to=message.message_id,
                              text=help_text))
 
 
-def handle_beers(message: Message):
+def handle_beers(message: Message, list_name: str):
     """
     Replies to the given message with beer tap listing
     :param message: Mssage to reply to
+    :param list_name: 
     :return: None
     """
-    beers = untappd.get_beers_on_list("hana")
+    beers = untappd.get_beers_on_list(list_name)
     msg = ""
 
     for beer in beers:
@@ -87,20 +91,24 @@ def handle_beers(message: Message):
     api.send_message(Message(chat_id=message.chat_id,
                              reply_to=message.message_id,
                              parse_mode="Markdown",
+                             disable_web_page_preview=True,
                              text=msg))
 
 
-def build_beer_lists():
+def build_beer_lists(lists: Dict):
     """
     Initializes beer lists
     :return: None
     """
-    untappd.set_beer_lists({"hana": "https://untappd.com/v/pub-kultainen-apina/17995?ng_menu_id=5035026b-1470-48c7"
-                                    "-b82a-bf1df18f5889"})
+    untappd.set_beer_lists(lists)
+
+    for list in lists:
+        beer_tap_triggers.append("/" + list)
 
 
 def main():
-    build_beer_lists()
+    build_beer_lists({"hana": "https://untappd.com/v/pub-kultainen-apina/17995?ng_menu_id=5035026b-1470-48c7"
+                              "-b82a-bf1df18f5889"})
     untappd.start()
     while True:
         try:
@@ -108,12 +116,13 @@ def main():
             for message in messages:
                 text = message.text.lower()
                 cmd_arr = re.split(r"[@ ]", text)
+                beer_list_cmds = [i for i in cmd_arr if i in beer_tap_triggers]
                 if triggers["image"] in cmd_arr:
                     tpe.submit(handle_image_request, message)
                 elif triggers["help"] in cmd_arr:
                     tpe.submit(handle_help, message)
-                elif triggers["beers"] in cmd_arr:
-                    tpe.submit(handle_beers, message)
+                elif len(beer_list_cmds) > 0:
+                    tpe.submit(handle_beers, message, beer_list_cmds[0][1:])
         except Exception as e:
             print(e)
             continue

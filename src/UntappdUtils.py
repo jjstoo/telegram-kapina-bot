@@ -34,7 +34,8 @@ class Beer:
                  rating,
                  ratings,
                  style,
-                 img):
+                 img=None,
+                 url=None):
         self.name = name
         self.brewery = brewery
         self.abv = abv
@@ -42,6 +43,7 @@ class Beer:
         self.ratings = ratings
         self.style = style
         self.img = img
+        self.url = url
 
     def __bool__(self):
         return all([self.name,
@@ -49,11 +51,10 @@ class Beer:
                     self.abv,
                     self.rating,
                     self.ratings,
-                    self.style,
-                    self.img])
+                    self.style])
 
     def __str__(self):
-        return "*{}* ({}) - {}, {}\n*{:.2f}/5*".format(self.name, self.style, self.brewery, self.abv, self.rating)
+        return "[{}]({}) ({}) - {}, {}\n*{:.2f}/5*".format(self.name, self.url, self.style, self.brewery, self.abv, self.rating)
 
 
 class UntappdCrawler:
@@ -154,7 +155,8 @@ class UntappdCrawler:
                         ratings=ratings,
                         abv=abv,
                         style=style,
-                        img=img)
+                        img=img,
+                        url=url)
 
         except requests.exceptions.ConnectTimeout:
             print("Connection timed out! Trying again")
