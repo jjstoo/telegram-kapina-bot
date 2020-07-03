@@ -114,6 +114,10 @@ class UntappdCrawler:
 
             return beers
 
+        except requests.exceptions.ConnectTimeout:
+            print("Connection timed out when getting menu! Trying again")
+            return self.get_beers_on_list(list, tries - 1)
+        
         except requests.exceptions.ProxyError:
             print("Proxy connection error when getting menu! Retrying")
             self.net.set_random_proxy()
@@ -159,7 +163,7 @@ class UntappdCrawler:
                         url=url)
 
         except requests.exceptions.ConnectTimeout:
-            print("Connection timed out! Trying again")
+            print("Connection timed out when getting beer data! Trying again")
             return self.get_beer(url, tries - 1)
 
         except requests.exceptions.ProxyError:
