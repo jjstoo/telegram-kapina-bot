@@ -1,6 +1,7 @@
 *.jpg
 *.jpeg
 *.png
+*.db
 src/token
 .idea/*
 __pycache__/*
