@@ -10,17 +10,14 @@ beer_tap_triggers = []
 
 # Command triggers
 triggers = {"image": "/kapina",
-            "help": "/help"}
+            "help": "/help",
+            "drink_records": "/kaljat"}
 
 # Triggers for adding drink records
 drink_triggers = {"beer": "/kalja",
                   "booze": "/viina",
                   "wine": "/viini"}
 
-# Triggers for querying drink records
-drink_list_triggers = {"beer": "/kaljat",
-                       "booze": "/viinat",
-                       "wine": "/viinit"}
 
 # Thread pool size for smooth handling of multiple requests
 pool_size = 10

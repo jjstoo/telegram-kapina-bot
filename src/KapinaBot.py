@@ -50,12 +50,22 @@ def handle_help_request(message: Message):
     :param message: Message to reply to
     :return: None
     """
-    help_text = "Get a snapshot by sending {}\n" \
-                "Currently available beer listings:\n" \
-                "{}".format(triggers["image"], beer_tap_triggers)
+    help_text = "*Get a snapshot of kapina:*\n" \
+                "{}\n" \
+                "*Log your drinks by sending:*\n" \
+                "{}\n" \
+                "*List your drinking records with:* \n" \
+                "{} (+ \"total\" for group records)\n" \
+                "*Currently available kapina beer infos:* \n" \
+                "{} \n" \
+                .format(triggers["image"],
+                        "\n".join(drink_triggers.values()),
+                        triggers["drink_records"],
+                        "\n".join(beer_tap_triggers))
 
     api.send_message(Message(chat_id=message.chat_id,
                              reply_to=message.message_id,
+                             parse_mode="Markdown",
                              text=help_text))
 
 
@@ -139,14 +149,14 @@ def main():
                 cmd_arr = re.split(r"[@ ]", text)
                 beer_list_cmds = [i for i in cmd_arr if i in beer_tap_triggers]
                 drink_cmd_found = any([i for i in cmd_arr if i in drink_triggers.values()])
-                drink_list_cmd_found = any([i for i in cmd_arr if i in drink_list_triggers.values()])
+
                 if triggers["image"] in cmd_arr:
                     tpe.submit(handle_image_request, message)
                 if triggers["help"] in cmd_arr:
                     tpe.submit(handle_help_request, message)
                 if drink_cmd_found:
                     tpe.submit(handle_drink_request, message, cmd_arr)
-                if drink_list_cmd_found:
+                if triggers["drink_records"] in cmd_arr:
                     tpe.submit(handle_drink_list_request, message, cmd_arr)
                 if len(beer_list_cmds) > 0:
                     tpe.submit(handle_beer_tap_request, message, beer_list_cmds[0][1:])
