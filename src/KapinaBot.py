@@ -7,28 +7,12 @@ from typing import Dict
 import sys
 import re
 
+from conf import *
 from TelegramUtils import TelegramHttpsAPI, Message
 from KapinaCam import KapinaCam
 from UntappdUtils import Untappd
 from DrinkTrackerUtils import DrinkTracker
 
-"""
-User configuration happens here
-"""
-# Snapshot filename
-snapshot_output_file = "snapshot.jpg"
-
-# Command triggers
-triggers = {"image": "/kapina",
-            "help": "/help"}
-
-drink_triggers = {"beer": "/kalja",
-                  "booze": "/viina",
-                  "wine": "/viini"}
-beer_tap_triggers = []
-
-# Thread pool size for smooth handling of multiple requests
-pool_size = 10
 
 """
 Initialization
