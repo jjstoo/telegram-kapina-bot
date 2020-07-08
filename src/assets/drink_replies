@@ -3,12 +3,15 @@
     "daily": {
       "1": [
         "Kippis! Päivän eka huurteinen maistuu aina parhaalta",
-        "Kippis! Toivottavasti maltoit edes iltapäivään"
+        "Kippis! Toivottavasti maltoit edes iltapäivään",
+        "Kippis! Kyllähän tätä on odotettukin",
+        "Houston, meillä on kalja"
       ],
       "2": [
         "Kippis! Päivän toinen maistuu vielä paremmalta",
         "Poikien kanssa ns. parilla? Varo vaaraa",
-        "Weizenbock tässä tilanteessa? Ehkä yksi"
+        "Weizenbock tässä tilanteessa? Ehkä yksi",
+        "2 > 1"
       ],
       "3": [
         "Vielä ehdit lopettamaan",
@@ -22,9 +25,19 @@
         "Apua saatana :D",
         "Jätkä pudottelee kyl kauniin kevyesti märkää :D",
         "Menisit töihin"
+      ],
+      "12": [
+        "Mäyräkoira kaadettu"
+      ],
+      "13": [
+        "Huutista :DDD"
+      ],
+      "16": [
+        "https://www.youtube.com/watch?v=IuUmJmwlEl0"
       ]
     },
     "total": {
+      "22": ["KaksytKAKS!"],
       "24": ["Elämä on kuin lava mansikkaa, ja sä olet juonut lavallisen"],
       "69": [
         "Very nice",
@@ -43,7 +56,8 @@
     "daily": {
       "1": [
         "Älä ny vittu sitä viinaa juo :--DD",
-        "Taas mennään saatana"
+        "Taas mennään saatana",
+        "Never stop the madness"
       ],
       "2": [
         "Parempi ois toimia kans vitun nörtti",
@@ -53,6 +67,9 @@
       "3": [
         "Katsokaa! Hän teki sen taas!",
         "Psykoosi starttaa"
+      ],
+      "4": [
+        "Mitä vittua silmäni näkevätkään! Viina sacrifice"
       ]
     },
     "total": {
@@ -66,7 +83,10 @@
   "viini": {
     "daily": {
       "1": ["Mimimi pakko juoda viiniä kun oon niin sivistynyt mimimimi"],
-      "2": ["Mikäs tyttöjen ilta tää tämmöinen on?"],
+      "2": [
+        "Mikäs tyttöjen ilta tää tämmöinen on?",
+        "Viinispeedrun?"
+      ],
       "3": [
         "Vielä yks lasillinen niin on oikeesti hauskaa",
         "Sivistynyttä? Ei todellakaan."
