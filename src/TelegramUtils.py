@@ -23,7 +23,8 @@ class Message:
         Initialization
         """
         self.message_id = None
-        self.from_user_id = None
+        self.user_id = None
+        self.username= None
         self.chat_id = chat_id
         self.reply_to = reply_to
         self.photo = photo
@@ -40,15 +41,16 @@ class Message:
         try:
             # Mandatory content
             self.message_id = json["message_id"]
-            self.from_user_id = json["from"]["id"]
+            self.user_id = json["from"]["id"]
             self.chat_id = json["chat"]["id"]
             # Optional content
             if "text" in json: self.text = json["text"]
+            if "username" in json["from"]: self.username = json["from"]["username"]
         except KeyError as ke:
             print("Message construction failed:" + str(ke))
 
     def __str__(self):
-        return "Chat:" + str(self.chat_id) + " Sender: " + str(self.from_user_id) + " Text: " + self.text
+        return "Chat:" + str(self.chat_id) + " Sender: " + str(self.user_id) + " Text: " + self.text
 
     def __eq__(self, other):
         if self.message_id == other.message_id and isinstance(other, Message):

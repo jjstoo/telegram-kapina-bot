@@ -10,6 +10,7 @@ import re
 from TelegramUtils import TelegramHttpsAPI, Message
 from KapinaCam import KapinaCam
 from UntappdUtils import Untappd
+from DrinkTrackerUtils import DrinkTracker
 
 """
 User configuration happens here
@@ -21,6 +22,9 @@ snapshot_output_file = "snapshot.jpg"
 triggers = {"image": "/kapina",
             "help": "/help"}
 
+drink_triggers = {"beer": "/kalja",
+                  "booze": "/viina",
+                  "wine": "/viini"}
 beer_tap_triggers = []
 
 # Thread pool size for smooth handling of multiple requests
@@ -39,6 +43,7 @@ except OSError:
 snapshot_sem = threading.Semaphore(1)
 api = TelegramHttpsAPI(TOKEN)
 cam = KapinaCam(snapshot_sem, snapshot_output_file)
+stats = DrinkTracker()
 tpe = ThreadPoolExecutor(max_workers=pool_size)
 untappd = Untappd(5)
 
@@ -95,6 +100,24 @@ def handle_beers(message: Message, list_name: str):
                              text=msg))
 
 
+def handle_drink(message: Message, cmd_arr):
+
+    print("Handling drink addition")
+
+    username = message.username
+    user_id = message.user_id
+
+    if username is not None and user_id is not None:
+        if drink_triggers["beer"] in cmd_arr:
+            stats.add_drink(user_id, username, drink_triggers["beer"][1:])
+        if drink_triggers["booze"] in cmd_arr:
+            stats.add_drink(user_id, username, drink_triggers["booze"][1:])
+        if drink_triggers["wine"] in cmd_arr:
+            stats.add_drink(user_id, username, drink_triggers["wine"][1:])
+    else:
+        print("Username or id missing from drink command!")
+
+
 def build_beer_lists(lists: Dict):
     """
     Initializes beer lists
@@ -117,13 +140,17 @@ def main():
                 text = message.text.lower()
                 cmd_arr = re.split(r"[@ ]", text)
                 beer_list_cmds = [i for i in cmd_arr if i in beer_tap_triggers]
+                drink_cmd_found = any([i for i in cmd_arr if i in drink_triggers.values()])
                 if triggers["image"] in cmd_arr:
                     tpe.submit(handle_image_request, message)
-                elif triggers["help"] in cmd_arr:
+                if triggers["help"] in cmd_arr:
                     tpe.submit(handle_help, message)
-                elif len(beer_list_cmds) > 0:
+                if drink_cmd_found:
+                    tpe.submit(handle_drink, message, cmd_arr)
+                if len(beer_list_cmds) > 0:
                     tpe.submit(handle_beers, message, beer_list_cmds[0][1:])
         except Exception as e:
+            print("Major oops")
             print(e)
             continue
 
