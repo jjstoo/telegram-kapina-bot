@@ -144,7 +144,7 @@ def handle_drinking_records_request(message: Message, cmd_arr):
 
     reply = "Yhteensä *{}* kpl juomia juotu:\n" \
             "{:<4} kaljaa\n" \
-            "{:<4} viiniä\n" \
+            "{:<4} viintä\n" \
             "{:<4} viinaa" \
         .format(
         total,
