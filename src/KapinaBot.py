@@ -122,7 +122,7 @@ def handle_drink_request(message: Message, cmd_arr):
         print("Username or id missing from drink command!")
 
 
-def handle_drink_list_request(message: Message, cmd_arr):
+def handle_drinking_records_request(message: Message, cmd_arr):
     print("Getting drink stats")
 
     total = False
@@ -190,7 +190,7 @@ def main():
                 if drink_cmd_found:
                     tpe.submit(handle_drink_request, message, cmd_arr)
                 if triggers["drink_records"] in cmd_arr:
-                    tpe.submit(handle_drink_list_request, message, cmd_arr)
+                    tpe.submit(handle_drinking_records_request, message, cmd_arr)
                 if len(beer_list_cmds) > 0:
                     tpe.submit(handle_beer_tap_request, message, beer_list_cmds[0][1:])
         except Exception as e:
