@@ -1,0 +1,84 @@
+{
+  "kalja": {
+    "daily": {
+      "1": [
+        "Kippis! Päivän eka huurteinen maistuu aina parhaalta",
+        "Kippis! Toivottavasti maltoit edes iltapäivään"
+      ],
+      "2": [
+        "Kippis! Päivän toinen maistuu vielä paremmalta",
+        "Poikien kanssa ns. parilla? Varo vaaraa",
+        "Weizenbock tässä tilanteessa? Ehkä yksi"
+      ],
+      "3": [
+        "Vielä ehdit lopettamaan",
+        "Oiskohan aika pelata yks bp?",
+        "Suunta on vain ylös"
+      ],
+      "5": [
+        "Tästä voi saada jo krapulan"
+      ],
+      "10": [
+        "Apua saatana :D",
+        "Jätkä pudottelee kyl kauniin kevyesti märkää :D",
+        "Menisit töihin"
+      ]
+    },
+    "total": {
+      "24": ["Elämä on kuin lava mansikkaa, ja sä olet juonut lavallisen"],
+      "69": [
+        "Very nice",
+        "69 - *Tirsk*"
+      ],
+      "100": [
+        "100-pack nautittu. Turvottaako?",
+        "SataSataSataSata, sata salam- kaljaa!"
+      ],
+      "666": ["Heil satan! 666 kaljaa vittu ikuisesti"],
+      "1000": ["Jätkä juo oikeesti :D 1000 kaljaa pudoteltu"]
+    }
+  },
+
+  "viina": {
+    "daily": {
+      "1": [
+        "Älä ny vittu sitä viinaa juo :--DD",
+        "Taas mennään saatana"
+      ],
+      "2": [
+        "Parempi ois toimia kans vitun nörtti",
+        "sos",
+        "Ota kolmas vitun vässykkä :D"
+      ],
+      "3": [
+        "Katsokaa! Hän teki sen taas!",
+        "Psykoosi starttaa"
+      ]
+    },
+    "total": {
+      "10": [
+        "Viinapöhö starttaa :D 10 terävää takana",
+        "Heeei, heeeeeeei jätä jämääät!"
+      ]
+    }
+  },
+
+  "viini": {
+    "daily": {
+      "1": ["Mimimi pakko juoda viiniä kun oon niin sivistynyt mimimimi"],
+      "2": ["Mikäs tyttöjen ilta tää tämmöinen on?"],
+      "3": [
+        "Vielä yks lasillinen niin on oikeesti hauskaa",
+        "Sivistynyttä? Ei todellakaan."
+      ],
+      "4": [
+        "Neljä lasia viiniä ja tyyppi on tossa kunnossa :D",
+        "Viidennellä lasillisella voit voittaa lennot vittu viinitarhaan"
+      ]
+    },
+    "total": {
+      "10": ["Vasta 10? Ranskalainen vauvakin juo sua enemmän viiniä :--D"],
+      "24": ["Elämä on kuin lava mansikkaa, ja sä olet juonut lavallisen viiniä. Mikä sua vaivaa?"]
+    }
+  }
+}

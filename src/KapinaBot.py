@@ -13,7 +13,6 @@ from KapinaCam import KapinaCam
 from UntappdUtils import Untappd
 from DrinkTrackerUtils import DrinkTracker
 
-
 """
 Initialization
 """
@@ -28,8 +27,8 @@ snapshot_sem = threading.Semaphore(1)
 api = TelegramHttpsAPI(TOKEN)
 cam = KapinaCam(snapshot_sem, snapshot_output_file)
 stats = DrinkTracker()
-tpe = ThreadPoolExecutor(max_workers=pool_size)
 untappd = Untappd(5)
+tpe = ThreadPoolExecutor(max_workers=pool_size)
 
 
 def handle_image_request(message: Message):
@@ -45,7 +44,7 @@ def handle_image_request(message: Message):
                                  photo=snapshot_output_file))
 
 
-def handle_help(message: Message):
+def handle_help_request(message: Message):
     """
     Replies to the given message with a help text
     :param message: Message to reply to
@@ -60,7 +59,7 @@ def handle_help(message: Message):
                              text=help_text))
 
 
-def handle_beers(message: Message, list_name: str):
+def handle_beer_tap_request(message: Message, list_name: str):
     """
     Replies to the given message with beer tap listing
     :param message: Mssage to reply to
@@ -84,22 +83,37 @@ def handle_beers(message: Message, list_name: str):
                              text=msg))
 
 
-def handle_drink(message: Message, cmd_arr):
-
+def handle_drink_request(message: Message, cmd_arr):
     print("Handling drink addition")
-
+    special_message_sent = False
     username = message.username
     user_id = message.user_id
 
     if username is not None and user_id is not None:
         if drink_triggers["beer"] in cmd_arr:
             stats.add_drink(user_id, username, drink_triggers["beer"][1:])
+            if stats.send_special_reply(api, message, drink_triggers["beer"][1:]): special_message_sent = True
         if drink_triggers["booze"] in cmd_arr:
             stats.add_drink(user_id, username, drink_triggers["booze"][1:])
+            if stats.send_special_reply(api, message, drink_triggers["booze"][1:]): special_message_sent = True
         if drink_triggers["wine"] in cmd_arr:
             stats.add_drink(user_id, username, drink_triggers["wine"][1:])
+            if stats.send_special_reply(api, message, drink_triggers["wine"][1:]): special_message_sent = True
+
+        if not special_message_sent:
+            reply = "*Kippis!* Juomia pudoteltu {} kpl, joista {} on nautittu tänään".format(
+                stats.get_total_drinks(telegram_id=user_id), stats.get_total_drinks_today(telegram_id=user_id))
+
+            api.send_message(Message(chat_id=message.chat_id,
+                                     reply_to=message.message_id,
+                                     parse_mode="Markdown",
+                                     text=reply))
     else:
         print("Username or id missing from drink command!")
+
+
+def handle_drink_list_request(message: Message, cmd_arr):
+    pass
 
 
 def build_beer_lists(lists: Dict):
@@ -125,14 +139,17 @@ def main():
                 cmd_arr = re.split(r"[@ ]", text)
                 beer_list_cmds = [i for i in cmd_arr if i in beer_tap_triggers]
                 drink_cmd_found = any([i for i in cmd_arr if i in drink_triggers.values()])
+                drink_list_cmd_found = any([i for i in cmd_arr if i in drink_list_triggers.values()])
                 if triggers["image"] in cmd_arr:
                     tpe.submit(handle_image_request, message)
                 if triggers["help"] in cmd_arr:
-                    tpe.submit(handle_help, message)
+                    tpe.submit(handle_help_request, message)
                 if drink_cmd_found:
-                    tpe.submit(handle_drink, message, cmd_arr)
+                    tpe.submit(handle_drink_request, message, cmd_arr)
+                if drink_list_cmd_found:
+                    tpe.submit(handle_drink_list_request, message, cmd_arr)
                 if len(beer_list_cmds) > 0:
-                    tpe.submit(handle_beers, message, beer_list_cmds[0][1:])
+                    tpe.submit(handle_beer_tap_request, message, beer_list_cmds[0][1:])
         except Exception as e:
             print("Major oops")
             print(e)

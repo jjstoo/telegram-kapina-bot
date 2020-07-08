@@ -3,13 +3,17 @@
 
 import sqlite3
 import time
+import json
+import random
 from datetime import datetime
 from typing import Tuple
 from threading import Semaphore
 
+from TelegramUtils import TelegramHttpsAPI, Message
+
 
 class DBAPI:
-    sql_create_stats_table = """ CREATE TABLE IF NOT EXISTS drinkstats (
+    sql_create_stats_table = """CREATE TABLE IF NOT EXISTS drinkstats (
                                         id integer PRIMARY KEY,
                                         telegram_id integer NOT NULL,
                                         telegram_username text,
@@ -118,9 +122,11 @@ class DBAPI:
 
 
 class DrinkTracker:
-
     def __init__(self):
         self.db = DBAPI("./drinkstats.db")
+        with open("assets/drink_replies", "r") as f:
+            self.replies = json.load(f)
+            print(self.replies)
 
     def add_drink(self,
                   telegram_id,
@@ -162,11 +168,39 @@ class DrinkTracker:
 
         return self.db.get_total_drinks(telegram_id, drink_type, time_range=(daystart, dayend))
 
+    def send_special_reply(self, api: TelegramHttpsAPI, message: Message, drink_type):
+        """
+        Sends a randomized special reply to the target if a reply is defined
+        :param api: Telegram api
+        :param message: Received message to reply to
+        :param drink_type: Drink type
+        :return: True if a special message was found
+        """
+        reply_found = False
+        total_amount = str(self.get_total_drinks(telegram_id=message.user_id, drink_type=drink_type))
+        daily_amount = str(self.get_total_drinks_today(telegram_id=message.user_id, drink_type=drink_type))
+
+        drink_daily_replies = self.replies[drink_type]["daily"]
+        drink_total_replies = self.replies[drink_type]["total"]
+
+        if daily_amount in drink_daily_replies:
+            reply_found = True
+            reply = random.choice(drink_daily_replies[daily_amount])
+            api.send_message(Message(chat_id=message.chat_id,
+                                     reply_to=message.message_id,
+                                     parse_mode="Markdown",
+                                     text=reply))
+
+        if total_amount in drink_total_replies:
+            reply_found = True
+            reply = random.choice(drink_total_replies[total_amount])
+            api.send_message(Message(chat_id=message.chat_id,
+                                     reply_to=message.message_id,
+                                     parse_mode="Markdown",
+                                     text=reply))
+
+        return reply_found
+
 
 if __name__ == "__main__":
     tracker = DrinkTracker()
-    # tracker.add_drink(123, "test", "viini")
-    drinks = tracker.get_total_drinks()
-    today = tracker.get_total_drinks_today()
-    print(drinks)
-    print(today)

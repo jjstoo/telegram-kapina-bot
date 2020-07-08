@@ -18,9 +18,9 @@ drink_triggers = {"beer": "/kalja",
                   "wine": "/viini"}
 
 # Triggers for querying drink records
-drink_list_triggers = {"beer": "/kalja",
-                       "booze": "/viina",
-                       "wine": "/viini"}
+drink_list_triggers = {"beer": "/kaljat",
+                       "booze": "/viinat",
+                       "wine": "/viinit"}
 
 # Thread pool size for smooth handling of multiple requests
 pool_size = 10
