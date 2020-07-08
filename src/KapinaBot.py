@@ -58,10 +58,10 @@ def handle_help_request(message: Message):
                 "{} (+ \"total\" for group records)\n" \
                 "*Currently available kapina beer infos:* \n" \
                 "{} \n" \
-                .format(triggers["image"],
-                        "\n".join(drink_triggers.values()),
-                        triggers["drink_records"],
-                        "\n".join(beer_tap_triggers))
+        .format(triggers["image"],
+                "\n".join(drink_triggers.values()),
+                triggers["drink_records"],
+                "\n".join(beer_tap_triggers))
 
     api.send_message(Message(chat_id=message.chat_id,
                              reply_to=message.message_id,
@@ -123,7 +123,40 @@ def handle_drink_request(message: Message, cmd_arr):
 
 
 def handle_drink_list_request(message: Message, cmd_arr):
-    pass
+    print("Getting drink stats")
+
+    total = False
+    extra_argument_idx = cmd_arr.index(triggers["drink_records"]) + 1
+    if len(cmd_arr) > extra_argument_idx:
+        if cmd_arr[extra_argument_idx].lower() == "total":
+            total = True
+
+    if total:
+        total = stats.get_total_drinks()
+        beers = stats.get_total_drinks(drink_type=drink_triggers["beer"][1:])
+        wines = stats.get_total_drinks(drink_type=drink_triggers["wine"][1:])
+        boozes = stats.get_total_drinks(drink_type=drink_triggers["booze"][1:])
+    else:
+        total = stats.get_total_drinks(telegram_id=message.user_id)
+        beers = stats.get_total_drinks(telegram_id=message.user_id, drink_type=drink_triggers["beer"][1:])
+        wines = stats.get_total_drinks(telegram_id=message.user_id, drink_type=drink_triggers["wine"][1:])
+        boozes = stats.get_total_drinks(telegram_id=message.user_id, drink_type=drink_triggers["booze"][1:])
+
+    reply = "Yhteensä *{}* kpl juomia juotu:\n" \
+            "{:<4} kaljaa\n" \
+            "{:<4} viiniä\n" \
+            "{:<4} viinaa" \
+        .format(
+        total,
+        beers,
+        wines,
+        boozes
+    )
+
+    api.send_message(Message(chat_id=message.chat_id,
+                             reply_to=message.message_id,
+                             parse_mode="Markdown",
+                             text=reply))
 
 
 def build_beer_lists(lists: Dict):
