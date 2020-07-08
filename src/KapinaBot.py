@@ -34,7 +34,7 @@ pool_size = 10
 Initialization
 """
 try:
-    with open("token", "r") as file:
+    with open("assets/token", "r") as file:
         TOKEN = file.read().replace("\n", "")
 except OSError:
     print("Token file not found")
