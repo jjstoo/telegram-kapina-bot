@@ -165,6 +165,16 @@ def build_beer_lists(lists: Dict):
         beer_tap_triggers.append("/" + list)
 
 
+def send_banhammer(message: Message):
+    api.send_message(Message(chat_id=message.chat_id,
+                             reply_to=message.message_id,
+                             parse_mode="Markdown",
+                             text="Jos oisit vain tiennyt millaisen synnin uudelleen vastauksesi \"viisaalla\" pikku "
+                                  "kommentillasi olisi sinulle suonut, olisit luultavasti hallinnut kieltäsi. Mutta "
+                                  "et voinut, et tiennyt ja nyt maksat sen hinnan, sinä senkin idiootti. Minä paskon "
+                                  "ympäri sinua ja hukutan sinut siihen."))
+
+
 def main():
     build_beer_lists({"hana": "https://untappd.com/v/pub-kultainen-apina/17995?ng_menu_id=5035026b-1470-48c7"
                               "-b82a-bf1df18f5889"})
@@ -173,21 +183,30 @@ def main():
         try:
             messages = api.get_messages()
             for message in messages:
+
                 text = message.text.lower()
                 cmd_arr = re.split(r"[@ ]", text)
                 beer_list_cmds = [i for i in cmd_arr if i in beer_tap_triggers]
                 drink_cmd_found = any([i for i in cmd_arr if i in drink_triggers.values()])
 
-                if triggers["image"] in cmd_arr:
-                    tpe.submit(handle_image_request, message)
-                if triggers["help"] in cmd_arr:
-                    tpe.submit(handle_help_request, message)
-                if drink_cmd_found:
-                    tpe.submit(handle_drink_request, message, cmd_arr)
-                if triggers["drink_records"] in cmd_arr:
-                    tpe.submit(handle_drinking_records_request, message, cmd_arr)
-                if len(beer_list_cmds) > 0:
-                    tpe.submit(handle_beer_tap_request, message, beer_list_cmds[0][1:])
+                # Blacklist checks
+                allowed = True
+                if message.username in blacklist:
+                    if any([i for i in cmd_arr if i in blacklist[message.username]]):
+                        tpe.submit(send_banhammer, message)
+                        allowed = False
+
+                if allowed:
+                    if triggers["image"] in cmd_arr:
+                        tpe.submit(handle_image_request, message)
+                    if triggers["help"] in cmd_arr:
+                        tpe.submit(handle_help_request, message)
+                    if drink_cmd_found:
+                        tpe.submit(handle_drink_request, message, cmd_arr)
+                    if triggers["drink_records"] in cmd_arr:
+                        tpe.submit(handle_drinking_records_request, message, cmd_arr)
+                    if len(beer_list_cmds) > 0:
+                        tpe.submit(handle_beer_tap_request, message, beer_list_cmds[0][1:])
         except Exception as e:
             print("Major oops")
             print(e)

@@ -13,6 +13,10 @@ triggers = {"image": "/kapina",
             "help": "/help",
             "drink_records": "/kaljat"}
 
+blacklist = {
+    "vulstars": "/kilju"
+}
+
 
 # Thread pool size for smooth handling of multiple requests
 pool_size = 10
