@@ -171,7 +171,7 @@ class DrinkTracker:
         daystart = datetime(year=today.year, month=today.month,
                             day=today.day, hour=0, second=0).timestamp()
         dayend = datetime(year=today.year, month=today.month,
-                          day=today.day, hour=23, second=59).timestamp()
+                          day=today.day, hour=23, minute=59, second=59).timestamp()
 
         return self.db.get_total_drinks(telegram_id, drink_type, time_range=(daystart, dayend))
 
@@ -186,6 +186,9 @@ class DrinkTracker:
         reply_found = False
         total_amount = str(self.get_total_drinks(telegram_id=message.user_id, drink_type=drink_type))
         daily_amount = str(self.get_total_drinks_today(telegram_id=message.user_id, drink_type=drink_type))
+
+        print(total_amount)
+        print(daily_amount)
 
         drink_daily_replies = self.replies[drink_type]["daily"]
         drink_total_replies = self.replies[drink_type]["total"]
@@ -211,4 +214,5 @@ class DrinkTracker:
 
 if __name__ == "__main__":
     tracker = DrinkTracker()
-    print(tracker.get_drink_cmds())
+    tracker.add_drink(123, "123", "testi")
+
