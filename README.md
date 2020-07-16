@@ -1,10 +1,20 @@
 # telegram-kapina-bot
 
-Telegram bot for getting live snapshots and beer info from Pub Kultainen Apina in Tampere, Finland.
-Webcam functionality is built around OpenCV and a super lightweight telegram bot API has been built from scratch.
+This is a Telegram bot created for our squads personal entertainment. 
+However, most of the modules have been made in a reusable manner.
 
-Untappd uses many methods to block web scraping. Due to these measures, this program utilizes a pool of
-random proxies to avoid being IP blocked from the site. This considerably slows down the update process, so Untappd updates are run
-periodically in the background.
+#### Main features
+* Super lightweight Telegram bot API :: [TelegramUtils][1]
+* Live webcam snapshots from our favorite bar, Kultainen Apina (kapina) in Tampere, Finland :: [KapinaCam][2]
+* Beer menu scraping from Untappd to get the current beer offering :: [UntappdUtils][3]
+* Beer (and other beverages) consumption logging :: [DrinkTrackerUtils][4]
 
-Telegram auth token must be placed in a file called "token" in the same working directory as the source files
+#### Untappd menu scraping
+
+Untappd uses many methods to block any web scraping attempts. Due to these restrictions, the module is configured to use a random proxy for each query.
+Proxying makes the connection slow and thus updates are run periodically in the background.
+
+[1]: https://github.com/jjstoo/telegram-kapina-bot/blob/master/src/TelegramUtils.py
+[2]: https://github.com/jjstoo/telegram-kapina-bot/blob/master/src/KapinaCam.py
+[3]: https://github.com/jjstoo/telegram-kapina-bot/blob/master/src/UntappdUtils.py
+[4]: https://github.com/jjstoo/telegram-kapina-bot/blob/master/src/DrinkTrackerUtils.py
