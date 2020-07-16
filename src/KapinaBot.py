@@ -27,6 +27,7 @@ snapshot_sem = threading.Semaphore(1)
 api = TelegramHttpsAPI(TOKEN)
 cam = KapinaCam(snapshot_sem, snapshot_output_file)
 stats = DrinkTracker()
+drink_triggers = stats.get_drink_cmds()
 untappd = Untappd(5)
 tpe = ThreadPoolExecutor(max_workers=pool_size)
 
@@ -100,15 +101,10 @@ def handle_drink_request(message: Message, cmd_arr):
     user_id = message.user_id
 
     if username is not None and user_id is not None:
-        if drink_triggers["beer"] in cmd_arr:
-            stats.add_drink(user_id, username, drink_triggers["beer"][1:])
-            if stats.send_special_reply(api, message, drink_triggers["beer"][1:]): special_message_sent = True
-        if drink_triggers["booze"] in cmd_arr:
-            stats.add_drink(user_id, username, drink_triggers["booze"][1:])
-            if stats.send_special_reply(api, message, drink_triggers["booze"][1:]): special_message_sent = True
-        if drink_triggers["wine"] in cmd_arr:
-            stats.add_drink(user_id, username, drink_triggers["wine"][1:])
-            if stats.send_special_reply(api, message, drink_triggers["wine"][1:]): special_message_sent = True
+        for trigger in drink_triggers:
+            if drink_triggers[trigger] in cmd_arr:
+                stats.add_drink(user_id, username, trigger)
+                if stats.send_special_reply(api, message, trigger): special_message_sent = True
 
         if not special_message_sent:
             reply = "*Kippis!* Juomia pudoteltu {} kpl, joista {} on nautittu tänään".format(
@@ -131,32 +127,31 @@ def handle_drinking_records_request(message: Message, cmd_arr):
         if cmd_arr[extra_argument_idx].lower() == "total":
             total = True
 
+    records = {}
+
     if total:
         total = stats.get_total_drinks()
-        beers = stats.get_total_drinks(drink_type=drink_triggers["beer"][1:])
-        wines = stats.get_total_drinks(drink_type=drink_triggers["wine"][1:])
-        boozes = stats.get_total_drinks(drink_type=drink_triggers["booze"][1:])
+        for drink in drink_triggers:
+            records[drink] = stats.get_total_drinks(drink_type=drink)
     else:
         total = stats.get_total_drinks(telegram_id=message.user_id)
-        beers = stats.get_total_drinks(telegram_id=message.user_id, drink_type=drink_triggers["beer"][1:])
-        wines = stats.get_total_drinks(telegram_id=message.user_id, drink_type=drink_triggers["wine"][1:])
-        boozes = stats.get_total_drinks(telegram_id=message.user_id, drink_type=drink_triggers["booze"][1:])
+        for drink in drink_triggers:
+            records[drink] = stats.get_total_drinks(drink_type=drink, telegram_id=message.user_id)
 
-    reply = "Yhteensä *{}* kpl juomia juotu:\n" \
-            "{:<4} kaljaa\n" \
-            "{:<4} viintä\n" \
-            "{:<4} viinaa" \
-        .format(
-        total,
-        beers,
-        wines,
-        boozes
-    )
+    reply = [f"Yhteensä *{total}* kpl juomia juotu:"]
+
+    print(reply)
+
+    for drink in records:
+        if records[drink] > 0:
+            reply.append(f"- {drink}: {records[drink]} kpl")
+
+    print(reply)
 
     api.send_message(Message(chat_id=message.chat_id,
                              reply_to=message.message_id,
                              parse_mode="Markdown",
-                             text=reply))
+                             text="\n".join(reply)))
 
 
 def build_beer_lists(lists: Dict):

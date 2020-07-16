@@ -128,6 +128,13 @@ class DrinkTracker:
             self.replies = json.load(f)
             print(self.replies)
 
+    def get_drink_cmds(self):
+        cmds = {}
+        for drink in self.replies.keys():
+            cmds[drink] = "/" + drink
+
+        return cmds
+
     def add_drink(self,
                   telegram_id,
                   telegram_username,
@@ -204,3 +211,4 @@ class DrinkTracker:
 
 if __name__ == "__main__":
     tracker = DrinkTracker()
+    print(tracker.get_drink_cmds())
